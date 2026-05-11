@@ -1,0 +1,35 @@
+# LLM Wiki Configuration Example
+# Copy this file to config.yaml and configure your LLM provider
+
+# LLM Provider Configuration
+# Supported: watsonx, ollama, openai
+llm:
+  provider: ollama  # Change to 'watsonx' or 'openai' as needed
+
+  # Ollama Configuration (local LLM)
+  ollama:
+    base_url: http://localhost:11434
+    model: llama3.2  # or mistral, codellama, etc.
+    temperature: 0.7
+
+  # WatsonX Configuration
+  watsonx:
+    url: https://us-south.ml.cloud.ibm.com
+    project_id: YOUR_PROJECT_ID
+    api_key: YOUR_API_KEY  # Or use environment variable WATSONX_API_KEY
+    model: meta-llama/llama-3-70b-instruct
+    temperature: 0.7
+    max_tokens: 4000
+
+  # OpenAI Configuration
+  openai:
+    api_key: YOUR_API_KEY  # Or use environment variable OPENAI_API_KEY
+    model: gpt-4
+    temperature: 0.7
+    max_tokens: 4000
+
+# Wiki Configuration
+wiki:
+  raw_dir: raw
+  wiki_dir: wiki
+  max_chunk_size: 8000  # Characters per chunk for long documents

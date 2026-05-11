@@ -199,7 +199,9 @@ def download_article(url: str, content_type: str = "article") -> None:
 
         # Create filename
         filename = sanitize_filename(title)
-        output_dir = Path(f"raw/{content_type}")
+        # Map type to directory (article -> articles)
+        dir_name = f"{content_type}s" if not content_type.endswith("s") else content_type
+        output_dir = Path(f"raw/{dir_name}")
         output_dir.mkdir(parents=True, exist_ok=True)
         output_path = output_dir / filename
 
