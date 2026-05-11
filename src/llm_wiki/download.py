@@ -154,8 +154,34 @@ def download_article(url: str, content_type: str = "article") -> None:
     print(f"Downloading: {url}")
 
     try:
-        # Fetch the page
-        response = requests.get(url, timeout=30)
+        # Create session with browser-like headers
+        session = requests.Session()
+        headers = {
+            "User-Agent": (
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/120.0.0.0 Safari/537.36"
+            ),
+            "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"),
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Upgrade-Insecure-Requests": "1",
+            "Sec-Fetch-Dest": "document",
+            "Sec-Fetch-Mode": "navigate",
+            "Sec-Fetch-Site": "none",
+            "Cache-Control": "max-age=0",
+        }
+
+        # For Medium, try to get the page with additional headers
+        if "medium.com" in url:
+            headers["Referer"] = "https://www.google.com/"
+            headers["sec-ch-ua"] = '"Not_A Brand";v="8", "Chromium";v="120"'
+            headers["sec-ch-ua-mobile"] = "?0"
+            headers["sec-ch-ua-platform"] = '"macOS"'
+
+        response = session.get(url, headers=headers, timeout=30, allow_redirects=True)
         response.raise_for_status()
 
         # Parse HTML
