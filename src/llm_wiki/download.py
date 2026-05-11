@@ -149,7 +149,7 @@ def extract_metadata(soup: BeautifulSoup, url: str) -> dict:
     return metadata
 
 
-def download_article(url: str, content_type: str = "articles") -> None:
+def download_article(url: str, content_type: str = "article") -> None:
     """Download article from URL and save as markdown."""
     print(f"Downloading: {url}")
 
@@ -234,8 +234,8 @@ def main():
     if len(sys.argv) < 3:
         print("Usage: .venv/bin/python src/llm_wiki/download.py <type> <url>")
         print("\nExamples:")
-        print("  .venv/bin/python src/llm_wiki/download.py articles https://example.com/article")
-        print("\nTypes: articles")
+        print("  .venv/bin/python src/llm_wiki/download.py article https://example.com/article")
+        print("\nTypes: article")
         sys.exit(1)
 
     content_type = sys.argv[1]
