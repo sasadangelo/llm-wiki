@@ -131,7 +131,7 @@ tags: {metadata.get("tags", [])}
 - **Published**: {frontmatter.get("published", "Unknown")}
 - **Downloaded**: {frontmatter.get("downloaded", "Unknown")}
 - **URL**: {frontmatter.get("url", "N/A")}
-- **Raw File**: [{article_path.name}](../../{article_path.relative_to(Path.cwd())})
+- **Raw File**: [{article_path.name}](../../{rel_path})
 
 ## Related
 
@@ -241,11 +241,73 @@ def update_index(wiki_dir: Path, created_pages: list[Path]) -> None:
     index_path = wiki_dir / "index.md"
     content = index_path.read_text(encoding="utf-8")
 
-    # Count pages by type
-    sources = len(list((wiki_dir / "sources").glob("*.md")))
-    entities = len(list((wiki_dir / "entities").glob("*.md")))
-    concepts = len(list((wiki_dir / "concepts").glob("*.md")))
-    analyses = len(list((wiki_dir / "analyses").glob("*.md")))
+    # Collect all pages by type
+    source_files = sorted((wiki_dir / "sources").glob("*.md"))
+    entity_files = sorted((wiki_dir / "entities").glob("*.md"))
+    concept_files = sorted((wiki_dir / "concepts").glob("*.md"))
+    analysis_files = sorted((wiki_dir / "analyses").glob("*.md"))
+
+    # Build sources section
+    sources_section = "### Articles & Blog Posts\n"
+    if source_files:
+        for f in source_files:
+            title = f.stem.replace("-", " ").title()
+            sources_section += f"- [{title}](sources/{f.name})\n"
+    else:
+        sources_section += "*No entries yet*\n"
+
+    # Build entities section
+    entities_section = "### Tools & Frameworks\n"
+    if entity_files:
+        for f in entity_files:
+            title = f.stem.replace("-", " ").title()
+            entities_section += f"- [{title}](entities/{f.name})\n"
+    else:
+        entities_section += "*No entries yet*\n"
+
+    # Build concepts section
+    concepts_section = "### Core Capabilities\n"
+    if concept_files:
+        for f in concept_files:
+            title = f.stem.replace("-", " ").replace("‑", " ").title()
+            concepts_section += f"- [{title}](concepts/{f.name})\n"
+    else:
+        concepts_section += "*No entries yet*\n"
+
+    # Build analyses section
+    analyses_section = "### Deep Dives\n"
+    if analysis_files:
+        for f in analysis_files:
+            title = f.stem.replace("-", " ").title()
+            analyses_section += f"- [{title}](analyses/{f.name})\n"
+    else:
+        analyses_section += "*No entries yet*\n"
+
+    # Replace sections in content
+    content = re.sub(
+        r"### Articles & Blog Posts\n(?:.*?\n)*?(?=###|\n## |---)",
+        sources_section + "\n",
+        content,
+        flags=re.DOTALL,
+    )
+    content = re.sub(
+        r"### Tools & Frameworks\n(?:.*?\n)*?(?=## Concepts)",
+        entities_section + "\n",
+        content,
+        flags=re.DOTALL,
+    )
+    content = re.sub(
+        r"### Core Capabilities\n(?:.*?\n)*?(?=## Sources)",
+        concepts_section + "\n",
+        content,
+        flags=re.DOTALL,
+    )
+    content = re.sub(
+        r"### Deep Dives\n(?:.*?\n)*?(?=---)",
+        analyses_section + "\n",
+        content,
+        flags=re.DOTALL,
+    )
 
     # Update counts in frontmatter
     content = re.sub(
@@ -255,7 +317,7 @@ def update_index(wiki_dir: Path, created_pages: list[Path]) -> None:
     )
 
     # Update footer stats
-    total = 1 + sources + entities + concepts + analyses
+    total = 1 + len(source_files) + len(entity_files) + len(concept_files) + len(analysis_files)
     content = re.sub(
         r"\*\*Total Pages\*\*: \d+",
         f"**Total Pages**: {total}",
@@ -268,7 +330,7 @@ def update_index(wiki_dir: Path, created_pages: list[Path]) -> None:
     )
     content = re.sub(
         r"\*\*Sources Processed\*\*: \d+",
-        f"**Sources Processed**: {sources}",
+        f"**Sources Processed**: {len(source_files)}",
         content,
     )
 
@@ -371,5 +433,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Made with Bob

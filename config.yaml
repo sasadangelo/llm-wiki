@@ -15,7 +15,7 @@ llm:
   # WatsonX Configuration (API key and project ID in .env)
   watsonx:
     url: https://us-south.ml.cloud.ibm.com
-    model: ibm/granite-4-h-small
+    model: openai/gpt-oss-120b
     temperature: 0.7
     max_tokens: 4000
 
