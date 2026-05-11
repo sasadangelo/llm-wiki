@@ -35,7 +35,7 @@ llm-wiki/
 
 Save a web article about AI Agents as markdown in `raw/articles/`.
 
-**Easy way**: Use [Obsidian Web Clipper](https://obsidian.md/clipper)
+**Easy way**: Use a browser extension like [MarkDownload](https://github.com/deathau/markdownload) to convert web pages to markdown
 
 ### 2. Ingest the Source
 
@@ -56,7 +56,7 @@ The LLM will read, discuss, create wiki pages, and update the index.
 - `wiki/concepts/` - See key concepts
 - `wiki/log.md` - See what happened
 
-**Pro tip**: Open this folder in [Obsidian](https://obsidian.md) to browse with graph view!
+**Note**: You can browse the wiki directly in VS Code or any markdown editor. The files are plain markdown with cross-references.
 
 ### 4. Ask Questions
 
@@ -149,7 +149,7 @@ git commit -m "Initial LLM Wiki setup"
 
 ## Tips
 
-1. **Use Obsidian**: Open this folder in Obsidian to browse with graph view
+1. **Browse in VS Code**: Use the markdown preview and file explorer to navigate the wiki
 2. **One source at a time**: Ingest sources individually for better control
 3. **Stay involved**: Review summaries and guide what to emphasize
 4. **File good answers**: Save substantial query responses as wiki pages
@@ -168,8 +168,7 @@ The LLM's job: everything else.
 ## Resources
 
 - [Original LLM Wiki concept](https://karpathy.ai/llmwiki) by Andrej Karpathy
-- [Obsidian](https://obsidian.md) - Recommended wiki browser
-- [Obsidian Web Clipper](https://obsidian.md/clipper) - Save web articles as markdown
+- [MarkDownload](https://github.com/deathau/markdownload) - Browser extension to save web articles as markdown
 - [QUICKSTART.md](QUICKSTART.md) - Get started in 5 minutes
 
 ## License

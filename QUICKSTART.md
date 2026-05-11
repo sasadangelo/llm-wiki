@@ -6,11 +6,11 @@ Get your LLM Wiki up and running in 5 minutes.
 
 Save a web article about AI Agents as markdown in `raw/articles/`.
 
-**Easy way**: Use [Obsidian Web Clipper](https://obsidian.md/clipper)
-1. Install the browser extension
+**Easy way**: Use [MarkDownload](https://github.com/deathau/markdownload) browser extension
+1. Install the extension for Chrome/Firefox
 2. Navigate to an article about AI Agents
-3. Click the clipper icon
-4. Save to `raw/articles/`
+3. Click the extension icon
+4. Save the markdown file to `raw/articles/`
 
 **Manual way**: Copy/paste article content into a new `.md` file in `raw/articles/`
 
@@ -38,7 +38,7 @@ Open these files to see what was created:
 - `wiki/concepts/` - See key concepts
 - `wiki/log.md` - See what happened
 
-**Pro tip**: Open this folder in [Obsidian](https://obsidian.md) to browse with graph view!
+**Tip**: Use VS Code's markdown preview (Cmd/Ctrl+Shift+V) to view pages with clickable links!
 
 ## Step 4: Ask Questions
 
