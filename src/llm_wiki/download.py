@@ -4,14 +4,17 @@ Download web articles and convert them to markdown for the LLM Wiki.
 Downloads images locally and updates references in the markdown.
 """
 
+from __future__ import annotations
+
 import re
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 from urllib.parse import urljoin, urlparse
 
 import requests  # type: ignore
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from markdownify import markdownify as md  # type: ignore
 
 
@@ -60,7 +63,7 @@ def download_image(img_url: str, base_url: str, assets_dir: Path) -> str | None:
         return None
 
 
-def extract_metadata(soup: BeautifulSoup, url: str) -> dict:
+def extract_metadata(soup: BeautifulSoup, url: str) -> dict[str, Any]:
     """Extract metadata from HTML."""
     metadata = {
         "url": url,
@@ -96,7 +99,9 @@ def extract_metadata(soup: BeautifulSoup, url: str) -> dict:
         elem = soup.select_one(selector)
         if elem:
             if attr == "content":
-                metadata["author"] = elem.get("content", "").strip()
+                content = elem.get("content", "")
+                if isinstance(content, str):
+                    metadata["author"] = content.strip()
             else:
                 metadata["author"] = elem.get_text().strip()
             if metadata["author"]:
@@ -115,9 +120,11 @@ def extract_metadata(soup: BeautifulSoup, url: str) -> dict:
         elem = soup.select_one(selector)
         if elem:
             if attr == "content":
-                date_str = elem.get("content", "").strip()
+                content = elem.get("content", "")
+                date_str = content.strip() if isinstance(content, str) else ""
             elif attr == "datetime":
-                date_str = elem.get("datetime", "").strip()
+                datetime_val = elem.get("datetime", "")
+                date_str = datetime_val.strip() if isinstance(datetime_val, str) else ""
             else:
                 date_str = elem.get_text().strip()
 
@@ -137,14 +144,19 @@ def extract_metadata(soup: BeautifulSoup, url: str) -> dict:
 
     # Extract keywords/tags
     keywords_tag = soup.find("meta", attrs={"name": "keywords"})
-    if keywords_tag:
+    if isinstance(keywords_tag, Tag):
         keywords = keywords_tag.get("content", "")
-        metadata["tags"] = [k.strip() for k in keywords.split(",") if k.strip()]
+        if isinstance(keywords, str):
+            metadata["tags"] = [k.strip() for k in keywords.split(",") if k.strip()]
 
     # Try article:tag meta tags
     if not metadata["tags"]:
         tag_metas = soup.find_all("meta", property="article:tag")
-        metadata["tags"] = [tag.get("content", "").strip() for tag in tag_metas if tag.get("content")]
+        metadata["tags"] = [
+            content.strip()
+            for tag in tag_metas
+            if isinstance(tag, Tag) and (content := tag.get("content")) and isinstance(content, str)
+        ]
 
     return metadata
 
@@ -274,5 +286,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Made with Bob

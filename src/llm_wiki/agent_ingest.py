@@ -119,7 +119,12 @@ tags: {metadata.get("tags", [])}
 
 ## Key Concepts
 
-{chr(10).join(f"- [{concept}](../concepts/{sanitize_filename(concept)}.md)" for concept in metadata.get("key_concepts", []))}
+{
+        chr(10).join(
+            f"- [{concept}](../concepts/{sanitize_filename(concept)}.md)"
+            for concept in metadata.get("key_concepts", [])
+        )
+    }
 
 ## Entities Mentioned
 
@@ -143,23 +148,99 @@ tags: {metadata.get("tags", [])}
     return output_path
 
 
-def create_concept_page(wiki_dir: Path, concept: str, article_title: str, source_file: str) -> Path:
+def generate_concept_definition(llm, concept: str, article_content: str, article_title: str) -> str:
+    """Use LLM to generate a brief definition of a concept based on article context."""
+    prompt = f"""Based on the following article, provide a brief 2-3 sentence explanation of the concept "{concept}".
+
+Article Title: {article_title}
+
+Article Content (first 3000 chars):
+{article_content[:3000]}
+
+Write a concise, informative explanation that describes what {concept} is and why it's important in the \
+context of AI agents and LLMs. Return ONLY the explanation text, no additional formatting or labels."""
+
+    system_prompt = "You are a technical writer creating concise explanations for a knowledge base about AI agents."
+
+    try:
+        definition = llm.generate(prompt, system_prompt).strip()
+        # Remove any markdown formatting or labels that might have been added
+        definition = re.sub(r"^(Definition:|Overview:|Explanation:)\s*", "", definition, flags=re.IGNORECASE)
+        return definition
+    except Exception as e:
+        print(f"  Warning: Could not generate definition for {concept}: {e}")
+        return "*This concept page will be expanded as more sources are added.*"
+
+
+def build_related_concepts_section(current_concept: str, all_concepts: list[str]) -> str:
+    """Build markdown list of related concepts for a concept page."""
+    related_links = []
+    current_filename = sanitize_filename(current_concept)
+
+    for concept in all_concepts:
+        if concept and sanitize_filename(concept) != current_filename:
+            related_links.append(f"- [{concept}]({sanitize_filename(concept)}.md)")
+
+    if not related_links:
+        return "*To be added*"
+
+    return "\n".join(sorted(set(related_links)))
+
+
+def create_concept_page(
+    wiki_dir: Path,
+    concept: str,
+    article_title: str,
+    source_file: str,
+    related_concepts: list[str] | None = None,
+    llm=None,
+    article_content: str = "",
+) -> Path:
     """Create or update concept page."""
     concepts_dir = wiki_dir / "concepts"
     concepts_dir.mkdir(exist_ok=True)
 
     filename = sanitize_filename(concept)
     output_path = concepts_dir / f"{filename}.md"
+    related_concepts_section = build_related_concepts_section(concept, related_concepts or [])
 
     if output_path.exists():
         # Update existing page
         content = output_path.read_text(encoding="utf-8")
+        updated = False
+
         if source_file not in content:
-            # Add to sources section
-            content += f"\n- [{article_title}](../sources/{source_file})\n"
+            sources_match = re.search(
+                r"(## Sources\n\n(?:- .+\n)+)",
+                content,
+                re.MULTILINE,
+            )
+            if sources_match:
+                replacement = sources_match.group(1) + f"- [{article_title}](../sources/{source_file})\n"
+                content = content.replace(sources_match.group(1), replacement, 1)
+            else:
+                content += f"\n- [{article_title}](../sources/{source_file})\n"
+            updated = True
+
+        content, related_count = re.subn(
+            r"## Related Concepts\n\n(?:\*To be added\*|(?:- .+\n)+)",
+            f"## Related Concepts\n\n{related_concepts_section}",
+            content,
+            count=1,
+        )
+        if related_count:
+            updated = True
+
+        if updated:
             output_path.write_text(content, encoding="utf-8")
             print(f"  ✓ Updated concept: {concept}")
     else:
+        # Generate definition using LLM if available
+        if llm and article_content:
+            definition = generate_concept_definition(llm, concept, article_content, article_title)
+        else:
+            definition = "*This concept page will be expanded as more sources are added.*"
+
         # Create new page
         content = f"""---
 type: concept
@@ -172,7 +253,7 @@ tags: [concept]
 
 ## Overview
 
-*This concept page will be expanded as more sources are added.*
+{definition}
 
 ## Sources
 
@@ -180,7 +261,7 @@ tags: [concept]
 
 ## Related Concepts
 
-*To be added*
+{related_concepts_section}
 
 ## Related
 
@@ -192,7 +273,33 @@ tags: [concept]
     return output_path
 
 
-def create_entity_page(wiki_dir: Path, entity: str, article_title: str, source_file: str) -> Path:
+def generate_entity_definition(llm, entity: str, article_content: str, article_title: str) -> str:
+    """Use LLM to generate a brief definition of an entity based on article context."""
+    prompt = f"""Based on the following article, provide a brief 2-3 sentence definition of "{entity}".
+
+Article Title: {article_title}
+
+Article Content (first 3000 chars):
+{article_content[:3000]}
+
+Write a concise, informative definition that explains what {entity} is and its relevance in the context \
+of AI agents and LLMs. Return ONLY the definition text, no additional formatting or labels."""
+
+    system_prompt = "You are a technical writer creating concise definitions for a knowledge base about AI agents."
+
+    try:
+        definition = llm.generate(prompt, system_prompt).strip()
+        # Remove any markdown formatting or labels that might have been added
+        definition = re.sub(r"^(Definition:|Overview:)\s*", "", definition, flags=re.IGNORECASE)
+        return definition
+    except Exception as e:
+        print(f"  Warning: Could not generate definition for {entity}: {e}")
+        return "*This entity page will be expanded as more sources are added.*"
+
+
+def create_entity_page(
+    wiki_dir: Path, entity: str, article_title: str, source_file: str, llm=None, article_content: str = ""
+) -> Path:
     """Create or update entity page."""
     entities_dir = wiki_dir / "entities"
     entities_dir.mkdir(exist_ok=True)
@@ -208,6 +315,12 @@ def create_entity_page(wiki_dir: Path, entity: str, article_title: str, source_f
             output_path.write_text(content, encoding="utf-8")
             print(f"  ✓ Updated entity: {entity}")
     else:
+        # Generate definition using LLM if available
+        if llm and article_content:
+            definition = generate_entity_definition(llm, entity, article_content, article_title)
+        else:
+            definition = "*This entity page will be expanded as more sources are added.*"
+
         # Create new page
         content = f"""---
 type: entity
@@ -220,7 +333,7 @@ tags: [entity]
 
 ## Overview
 
-*This entity page will be expanded as more sources are added.*
+{definition}
 
 ## Mentioned In
 
@@ -391,15 +504,30 @@ def ingest_article(article_path: Path, config_path: str = "config.yaml") -> None
     created_pages.append(source_page)
 
     # Create concept pages
-    for concept in metadata.get("key_concepts", []):
-        if concept:
-            page = create_concept_page(wiki_dir, concept, frontmatter.get("title", "Unknown"), source_page.stem)
-            created_pages.append(page)
+    all_concepts = [concept for concept in metadata.get("key_concepts", []) if concept]
+    for concept in all_concepts:
+        page = create_concept_page(
+            wiki_dir,
+            concept,
+            frontmatter.get("title", "Unknown"),
+            source_page.stem,
+            related_concepts=all_concepts,
+            llm=llm,
+            article_content=content,
+        )
+        created_pages.append(page)
 
     # Create entity pages
     for entity in metadata.get("entities", []):
         if entity:
-            page = create_entity_page(wiki_dir, entity, frontmatter.get("title", "Unknown"), source_page.stem)
+            page = create_entity_page(
+                wiki_dir,
+                entity,
+                frontmatter.get("title", "Unknown"),
+                source_page.stem,
+                llm=llm,
+                article_content=content,
+            )
             created_pages.append(page)
 
     print()

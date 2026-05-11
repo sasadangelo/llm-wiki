@@ -10,7 +10,10 @@ sources: []
 
 ## Purpose
 
-This wiki is a living knowledge base about AI Agents, built using the LLM Wiki pattern. It accumulates and synthesizes knowledge from various sources over time, maintaining a structured, interlinked collection of insights about agent architectures, patterns, tools, and best practices.
+This wiki is a living knowledge base about AI Agents, built using the
+LLM Wiki pattern. It accumulates and synthesizes knowledge from various
+sources over time, maintaining a structured, interlinked collection of
+insights about agent architectures, patterns, tools, and best practices.
 
 ## Current State
 
@@ -23,11 +26,16 @@ This wiki is a living knowledge base about AI Agents, built using the LLM Wiki p
 
 This knowledge base focuses on:
 
-- **Agent Architectures**: Different patterns and approaches to building AI agents (ReAct, ReWOO, Reflexion, etc.)
-- **Core Capabilities**: Tool use, function calling, planning, reasoning, memory systems
-- **Multi-Agent Systems**: Coordination, communication, and collaboration between agents
-- **Frameworks & Tools**: LangChain, AutoGPT, and other agent development frameworks
-- **Evaluation**: Benchmarks, metrics, and best practices for assessing agent performance
+- **Agent Architectures**: Different patterns and approaches to building
+  AI agents (ReAct, ReWOO, Reflexion, etc.)
+- **Core Capabilities**: Tool use, function calling, planning, reasoning,
+  memory systems
+- **Multi-Agent Systems**: Coordination, communication, and collaboration
+  between agents
+- **Frameworks & Tools**: LangChain, AutoGPT, and other agent development
+  frameworks
+- **Evaluation**: Benchmarks, metrics, and best practices for assessing
+  agent performance
 - **Research & Practice**: Both academic research and practical implementations
 
 ## Key Themes
@@ -41,7 +49,8 @@ This wiki grows through:
 2. **Query**: Answering questions and filing substantial analyses
 3. **Lint**: Periodic health checks and maintenance
 
-Each operation is logged in [log.md](log.md), and all pages are cataloged in [index.md](index.md).
+Each operation is logged in [log.md](log.md), and all pages are
+cataloged in [index.md](index.md).
 
 ## How to Use
 
@@ -54,4 +63,4 @@ Each operation is logged in [log.md](log.md), and all pages are cataloged in [in
 
 - [Index](index.md) - Full catalog of pages
 - [Log](log.md) - Chronological history
-- [SCHEMA.md](../SCHEMA.md) - Wiki structure and conventions
+- [AGENTS.md](../AGENTS.md) - Wiki structure and conventions

@@ -7,19 +7,12 @@ Complete guide for using the LLM Wiki system with automatic agents.
 ### 1. Install Dependencies
 
 ```bash
-uv sync
+uv sync --dev
 ```
 
 ### 2. Configure LLM Provider
 
-Copy the example configuration files:
-
-```bash
-cp config.yaml.example config.yaml
-cp .env.example .env
-```
-
-Edit `config.yaml` to choose your LLM provider and edit `.env` to add your API keys.
+Configure the LLM Provider. Edit `config.yaml` to choose your LLM provider and edit `.env` to add your API keys.
 
 #### Option A: Ollama (Local, Free)
 
@@ -55,21 +48,6 @@ llm:
 ```bash
 WATSONX_API_KEY=your_api_key_here
 WATSONX_PROJECT_ID=your_project_id_here
-```
-
-#### Option C: OpenAI
-
-**config.yaml:**
-```yaml
-llm:
-  provider: openai
-  openai:
-    model: gpt-4
-```
-
-**.env:**
-```bash
-OPENAI_API_KEY=your_api_key_here
 ```
 
 ## Workflow
@@ -161,6 +139,64 @@ Concept pages: 5
 Analysis pages: 0
 
 All articles have been processed!
+### 5. Clean the Wiki (Reset to Initial State)
+
+If you want to start fresh and remove all generated content:
+
+```bash
+# Preview what will be deleted (recommended first)
+uv run src/llm_wiki/clean_wiki.py --dry-run
+
+# Actually clean the wiki
+uv run src/llm_wiki/clean_wiki.py
+```
+
+**What happens:**
+1. Shows all files that will be removed
+2. Asks for confirmation
+3. Removes all generated wiki pages (entities, concepts, sources, analyses)
+4. Resets `wiki/index.md`, `wiki/log.md`, and `wiki/overview.md` to initial state
+5. Preserves all raw sources in `raw/articles/` and `raw/assets/`
+
+**Example output:**
+
+```
+🧹 LLM Wiki Cleanup Tool
+==================================================
+📊 Found 20 files to remove
+
+📁 Files to be removed:
+  - wiki/concepts/...
+  - wiki/entities/...
+  - wiki/sources/...
+
+⚠️  Are you sure you want to delete these files? (yes/no): yes
+
+🗑️  Removing files...
+  ✓ Removed wiki/concepts/...
+
+📝 Resetting wiki to initial state...
+  ✓ Reset wiki/index.md
+  ✓ Reset wiki/log.md
+  ✓ Reset wiki/overview.md
+
+✅ Wiki cleaned successfully!
+
+📚 Raw sources preserved:
+  - raw/articles/ (source documents)
+  - raw/assets/ (images and media)
+
+🚀 Next steps:
+  1. Run ingest to process existing sources
+  2. Or add new sources to raw/articles/
+```
+
+**When to use:**
+- Starting fresh with a clean wiki
+- After experimenting with ingestion
+- When you want to rebuild the knowledge base from scratch
+- Before major restructuring
+
 ```
 
 ### 4. Browse the Wiki

@@ -25,7 +25,7 @@ llm-wiki/
 │   └── analyses/          # Generated analyses
 ├── src/llm_wiki/          # Helper tools
 │   └── ingest.py          # Status checker
-├── SCHEMA.md              # Wiki structure and workflows
+├── AGENTS.md              # Wiki structure and workflows
 └── README.md              # This file
 ```
 
@@ -43,7 +43,7 @@ Tell your LLM agent (Claude, ChatGPT, etc.):
 
 ```
 Please ingest the article at raw/articles/[your-filename].md
-following the SCHEMA.md workflow.
+following the AGENTS.md workflow.
 ```
 
 The LLM will read, discuss, create wiki pages, and update the index.
@@ -76,17 +76,17 @@ Repeat steps 1-2. Watch your knowledge base grow!
 
 Check wiki status:
 ```bash
-.venv/bin/python src/llm_wiki/ingest.py status
+uv run src/llm_wiki/ingest.py status
 ```
 
 See next article to process:
 ```bash
-.venv/bin/python src/llm_wiki/ingest.py next
+uv run src/llm_wiki/ingest.py next
 ```
 
 List unprocessed articles:
 ```bash
-.venv/bin/python src/llm_wiki/ingest.py list
+uv run src/llm_wiki/ingest.py list
 ```
 
 ## Workflows

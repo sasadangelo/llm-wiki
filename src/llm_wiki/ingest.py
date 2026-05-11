@@ -4,8 +4,10 @@ Simple helper script for ingesting sources into the LLM Wiki.
 This is optional - you can also just tell your LLM agent to ingest files directly.
 """
 
+import re
 import sys
 from pathlib import Path
+from re import Match
 
 
 def list_raw_articles():
@@ -18,22 +20,22 @@ def list_raw_articles():
         return []
 
     # Get all markdown files in raw/articles
-    raw_files = list(raw_dir.glob("*.md"))
+    raw_files: list[Path] = list(raw_dir.glob(pattern="*.md"))
 
     # Get all source summaries in wiki/sources
     processed = set()
     if wiki_sources.exists():
         for source_file in wiki_sources.glob("*.md"):
-            # Read the file to find the raw source reference
-            content = source_file.read_text()
-            # Simple heuristic: look for raw/articles/ references
-            for line in content.split("\n"):
-                if "raw/articles/" in line:
-                    # Extract filename
-                    parts = line.split("raw/articles/")
-                    if len(parts) > 1:
-                        filename = parts[1].split(")")[0].split("]")[0].strip()
-                        processed.add(filename)
+            # Read the file and extract source_file from YAML frontmatter
+            content: str = source_file.read_text()
+
+            # Look for source_file in YAML frontmatter
+            match: Match[str] | None = re.search(r"^source_file:\s*(.+)$", content, re.MULTILINE)
+            if match:
+                source_path = match.group(1).strip()
+                # Extract just the filename from the path
+                filename: str = Path(source_path).name
+                processed.add(filename)
 
     # Find unprocessed files
     unprocessed = []
@@ -44,16 +46,16 @@ def list_raw_articles():
     return unprocessed
 
 
-def show_status():
+def show_status() -> None:
     """Show the current status of the wiki."""
     print("=== LLM Wiki Status ===\n")
 
     # Count files in each directory
-    raw_count = len(list(Path("raw/articles").glob("*.md"))) if Path("raw/articles").exists() else 0
-    wiki_sources = len(list(Path("wiki/sources").glob("*.md"))) if Path("wiki/sources").exists() else 0
-    wiki_entities = len(list(Path("wiki/entities").glob("*.md"))) if Path("wiki/entities").exists() else 0
-    wiki_concepts = len(list(Path("wiki/concepts").glob("*.md"))) if Path("wiki/concepts").exists() else 0
-    wiki_analyses = len(list(Path("wiki/analyses").glob("*.md"))) if Path("wiki/analyses").exists() else 0
+    raw_count: int = len(list(Path("raw/articles").glob("*.md"))) if Path("raw/articles").exists() else 0
+    wiki_sources: int = len(list(Path("wiki/sources").glob("*.md"))) if Path("wiki/sources").exists() else 0
+    wiki_entities: int = len(list(Path("wiki/entities").glob("*.md"))) if Path("wiki/entities").exists() else 0
+    wiki_concepts: int = len(list(Path("wiki/concepts").glob("*.md"))) if Path("wiki/concepts").exists() else 0
+    wiki_analyses: int = len(list(Path("wiki/analyses").glob("*.md"))) if Path("wiki/analyses").exists() else 0
 
     print(f"Raw articles: {raw_count}")
     print(f"Processed sources: {wiki_sources}")
@@ -73,7 +75,7 @@ def show_status():
     print()
 
 
-def suggest_next():
+def suggest_next() -> None:
     """Suggest the next article to ingest."""
     unprocessed = list_raw_articles()
     if not unprocessed:
@@ -88,9 +90,9 @@ def suggest_next():
     print()
 
 
-def main():
+def main() -> None:
     if len(sys.argv) > 1:
-        command = sys.argv[1]
+        command: str = sys.argv[1]
         if command == "status":
             show_status()
         elif command == "next":
@@ -112,5 +114,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Made with Bob
