@@ -7,7 +7,6 @@ import os
 from abc import ABC, abstractmethod
 from typing import Any
 
-import requests  # type: ignore
 import yaml  # type: ignore
 from dotenv import load_dotenv
 
@@ -25,31 +24,38 @@ class LLMProvider(ABC):
 
 
 class OllamaProvider(LLMProvider):
-    """Ollama local LLM provider."""
+    """Ollama local LLM provider using langchain-ollama."""
 
     def __init__(self, config: dict[str, Any]):
+        try:
+            from langchain_ollama import ChatOllama
+        except ImportError as e:
+            raise ImportError(
+                "langchain-ollama is required for Ollama provider. Install with: uv add langchain-ollama"
+            ) from e
+
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "llama3.2")
         self.temperature = config.get("temperature", 0.7)
 
+        # Initialize ChatOllama
+        self.chat = ChatOllama(
+            model=self.model,
+            base_url=self.base_url,
+            temperature=self.temperature,
+        )
+
     def generate(self, prompt: str, system_prompt: str | None = None) -> str:
-        """Generate text using Ollama API."""
-        url = f"{self.base_url}/api/generate"
-
-        payload = {
-            "model": self.model,
-            "prompt": prompt,
-            "stream": False,
-            "options": {"temperature": self.temperature},
-        }
-
-        if system_prompt:
-            payload["system"] = system_prompt
-
+        """Generate text using Ollama via langchain-ollama."""
         try:
-            response = requests.post(url, json=payload, timeout=300)
-            response.raise_for_status()
-            return response.json()["response"]
+            # Combine system and user prompt if provided
+            full_prompt = prompt
+            if system_prompt:
+                full_prompt = f"{system_prompt}\n\n{prompt}"
+
+            # Use invoke for synchronous response
+            response = self.chat.invoke(full_prompt)
+            return str(response.content)
         except Exception as e:
             raise RuntimeError(f"Ollama API error: {e}") from e
 
@@ -104,15 +110,22 @@ class WatsonXProvider(LLMProvider):
 
             # Use invoke instead of stream for simpler synchronous response
             response = self.chat.invoke(full_prompt)
-            return response.content
+            return str(response.content)
         except Exception as e:
             raise RuntimeError(f"WatsonX API error: {e}") from e
 
 
 class OpenAIProvider(LLMProvider):
-    """OpenAI LLM provider."""
+    """OpenAI LLM provider using langchain-openai."""
 
     def __init__(self, config: dict[str, Any]):
+        try:
+            from langchain_openai import ChatOpenAI
+        except ImportError as e:
+            raise ImportError(
+                "langchain-openai is required for OpenAI provider. Install with: uv add langchain-openai"
+            ) from e
+
         self.api_key = os.getenv("OPENAI_API_KEY")
         self.model = config.get("model", "gpt-4")
         self.temperature = config.get("temperature", 0.7)
@@ -121,31 +134,24 @@ class OpenAIProvider(LLMProvider):
         if not self.api_key:
             raise ValueError("OpenAI API key not found in .env file (OPENAI_API_KEY)")
 
+        # Initialize ChatOpenAI (api_key read from OPENAI_API_KEY env var automatically)
+        self.chat = ChatOpenAI(
+            model=self.model,
+            temperature=self.temperature,
+            max_completion_tokens=self.max_tokens,
+        )
+
     def generate(self, prompt: str, system_prompt: str | None = None) -> str:
-        """Generate text using OpenAI API."""
-        url = "https://api.openai.com/v1/chat/completions"
-
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-        }
-
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": prompt})
-
-        payload = {
-            "model": self.model,
-            "messages": messages,
-            "temperature": self.temperature,
-            "max_tokens": self.max_tokens,
-        }
-
+        """Generate text using OpenAI via langchain-openai."""
         try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            response.raise_for_status()
-            return response.json()["choices"][0]["message"]["content"]
+            # Combine system and user prompt if provided
+            full_prompt = prompt
+            if system_prompt:
+                full_prompt = f"{system_prompt}\n\n{prompt}"
+
+            # Use invoke for synchronous response
+            response = self.chat.invoke(full_prompt)
+            return str(response.content)
         except Exception as e:
             raise RuntimeError(f"OpenAI API error: {e}") from e
 

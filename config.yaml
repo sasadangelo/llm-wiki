@@ -4,7 +4,7 @@
 # LLM Provider Configuration
 # Supported: watsonx, ollama, openai
 llm:
-  provider: ollama # Change to 'watsonx' or 'openai' as needed
+  provider: watsonx # Change to 'watsonx' or 'openai' as needed
 
   # Ollama Configuration (local LLM, no API key needed)
   ollama:

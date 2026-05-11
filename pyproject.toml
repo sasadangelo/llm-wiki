@@ -10,6 +10,8 @@ dependencies = [
   "python-dotenv>=1.0.0",
   "langchain-ibm>=1.0.10",
   "ibm-watsonx-ai>=1.3.42",
+  "langchain-ollama>=1.1.0",
+  "langchain-openai>=1.2.1",
 ]
 description = "LLM Wiki - A living knowledge base about AI Agents"
 keywords = ["llm", "wiki", "ai-agents", "knowledge-base"]
