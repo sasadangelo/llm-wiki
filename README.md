@@ -74,6 +74,15 @@ Repeat steps 1-2. Watch your knowledge base grow!
 
 ## Helper Tools
 
+### Clean the Wiki
+
+Remove all generated wiki files to start fresh:
+```bash
+uv run python src/llm_wiki/clean_wiki.py
+```
+
+### Check Wiki Status
+
 Check wiki status:
 ```bash
 uv run src/llm_wiki/ingest.py status
@@ -88,6 +97,27 @@ List unprocessed articles:
 ```bash
 uv run src/llm_wiki/ingest.py list
 ```
+
+### HTTP Agent Server
+
+Start the HTTP agent server to interact with the wiki via API:
+```bash
+uv run python src/llm_wiki/http_agent_server.py
+```
+
+The server provides endpoints for:
+- Ingesting articles
+- Querying the knowledge base
+- Managing the wiki
+
+### Gradio Chat Interface
+
+Start the Gradio chat interface for interactive conversations:
+```bash
+python gradio_chat.py
+```
+
+This provides a web-based UI to interact with the wiki agent.
 
 ## Workflows
 
