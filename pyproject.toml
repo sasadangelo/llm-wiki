@@ -2,7 +2,11 @@
 authors = [
   {name = "Salvatore D'Angelo", email = "sasadangelo@gmail.com"},
 ]
-dependencies = []
+dependencies = [
+  "requests>=2.32.0",
+  "markdownify>=0.13.0",
+  "beautifulsoup4>=4.12.0",
+]
 description = "LLM Wiki - A living knowledge base about AI Agents"
 keywords = ["llm", "wiki", "ai-agents", "knowledge-base"]
 name = "llm-wiki"
@@ -21,6 +25,8 @@ dev = [
   "pytest>=8.4.2",
   "radon>=6.0.1",
   "ruff>=0.8.0",
+  "types-requests>=2.32.0",
+  "types-beautifulsoup4>=4.12.0",
 ]
 
 [tool.ruff]
