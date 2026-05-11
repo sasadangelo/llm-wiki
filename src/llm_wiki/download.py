@@ -231,16 +231,15 @@ tags: [{tags_str}]
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: .venv/bin/python src/llm_wiki/download.py <url> [type]")
+    if len(sys.argv) < 3:
+        print("Usage: .venv/bin/python src/llm_wiki/download.py <type> <url>")
         print("\nExamples:")
-        print("  .venv/bin/python src/llm_wiki/download.py https://example.com/article")
-        print("  .venv/bin/python src/llm_wiki/download.py https://example.com/article articles")
-        print("\nTypes: articles (default)")
+        print("  .venv/bin/python src/llm_wiki/download.py articles https://example.com/article")
+        print("\nTypes: articles")
         sys.exit(1)
 
-    url = sys.argv[1]
-    content_type = sys.argv[2] if len(sys.argv) > 2 else "articles"
+    content_type = sys.argv[1]
+    url = sys.argv[2]
 
     download_article(url, content_type)
 
