@@ -12,16 +12,18 @@ uv sync
 
 ### 2. Configure LLM Provider
 
-Copy the example configuration:
+Copy the example configuration files:
 
 ```bash
 cp config.yaml.example config.yaml
+cp .env.example .env
 ```
 
-Edit `config.yaml` and choose your LLM provider:
+Edit `config.yaml` to choose your LLM provider and edit `.env` to add your API keys.
 
 #### Option A: Ollama (Local, Free)
 
+**config.yaml:**
 ```yaml
 llm:
   provider: ollama
@@ -29,6 +31,8 @@ llm:
     base_url: http://localhost:11434
     model: llama3.2
 ```
+
+**No .env needed** - Ollama runs locally without API keys.
 
 Make sure Ollama is running:
 ```bash
@@ -38,24 +42,34 @@ ollama pull llama3.2
 
 #### Option B: WatsonX (IBM Cloud)
 
+**config.yaml:**
 ```yaml
 llm:
   provider: watsonx
   watsonx:
     url: https://us-south.ml.cloud.ibm.com
-    project_id: YOUR_PROJECT_ID
-    api_key: YOUR_API_KEY
     model: meta-llama/llama-3-70b-instruct
+```
+
+**.env:**
+```bash
+WATSONX_API_KEY=your_api_key_here
+WATSONX_PROJECT_ID=your_project_id_here
 ```
 
 #### Option C: OpenAI
 
+**config.yaml:**
 ```yaml
 llm:
   provider: openai
   openai:
-    api_key: YOUR_API_KEY
     model: gpt-4
+```
+
+**.env:**
+```bash
+OPENAI_API_KEY=your_api_key_here
 ```
 
 ## Workflow

@@ -8,7 +8,11 @@ from abc import ABC, abstractmethod
 from typing import Any
 
 import requests  # type: ignore
-import yaml
+import yaml  # type: ignore
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class LLMProvider(ABC):
@@ -55,14 +59,16 @@ class WatsonXProvider(LLMProvider):
 
     def __init__(self, config: dict[str, Any]):
         self.url = config.get("url", "https://us-south.ml.cloud.ibm.com")
-        self.project_id = config.get("project_id")
-        self.api_key = config.get("api_key") or os.getenv("WATSONX_API_KEY")
+        self.project_id = os.getenv("WATSONX_PROJECT_ID")
+        self.api_key = os.getenv("WATSONX_API_KEY")
         self.model = config.get("model", "meta-llama/llama-3-70b-instruct")
         self.temperature = config.get("temperature", 0.7)
         self.max_tokens = config.get("max_tokens", 4000)
 
         if not self.api_key:
-            raise ValueError("WatsonX API key not found in config or environment")
+            raise ValueError("WatsonX API key not found in .env file (WATSONX_API_KEY)")
+        if not self.project_id:
+            raise ValueError("WatsonX project ID not found in .env file (WATSONX_PROJECT_ID)")
 
     def generate(self, prompt: str, system_prompt: str | None = None) -> str:
         """Generate text using WatsonX API."""
@@ -101,13 +107,13 @@ class OpenAIProvider(LLMProvider):
     """OpenAI LLM provider."""
 
     def __init__(self, config: dict[str, Any]):
-        self.api_key = config.get("api_key") or os.getenv("OPENAI_API_KEY")
+        self.api_key = os.getenv("OPENAI_API_KEY")
         self.model = config.get("model", "gpt-4")
         self.temperature = config.get("temperature", 0.7)
         self.max_tokens = config.get("max_tokens", 4000)
 
         if not self.api_key:
-            raise ValueError("OpenAI API key not found in config or environment")
+            raise ValueError("OpenAI API key not found in .env file (OPENAI_API_KEY)")
 
     def generate(self, prompt: str, system_prompt: str | None = None) -> str:
         """Generate text using OpenAI API."""

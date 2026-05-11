@@ -1,0 +1,35 @@
+# LLM Wiki Configuration
+# Secrets (API keys) should be in .env file
+
+# LLM Provider Configuration
+# Supported: watsonx, ollama, openai
+llm:
+  provider: ollama # Change to 'watsonx' or 'openai' as needed
+
+  # Ollama Configuration (local LLM, no API key needed)
+  ollama:
+    base_url: http://localhost:11434
+    model: llama3.2 # or mistral, codellama, etc.
+    temperature: 0.7
+
+  # WatsonX Configuration (API key and project ID in .env)
+  watsonx:
+    url: https://us-south.ml.cloud.ibm.com
+    model: meta-llama/llama-3-70b-instruct
+    temperature: 0.7
+    max_tokens: 4000
+
+  # OpenAI Configuration (API key in .env)
+  openai:
+    model: gpt-4
+    temperature: 0.7
+    max_tokens: 4000
+
+# Wiki Configuration
+wiki:
+  raw_dir: raw
+  wiki_dir: wiki
+  max_chunk_size: 8000 # Characters per chunk for long documents
+
+
+# Made with Bob
