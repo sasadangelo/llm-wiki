@@ -55,13 +55,22 @@ class OllamaProvider(LLMProvider):
 
 
 class WatsonXProvider(LLMProvider):
-    """IBM WatsonX LLM provider."""
+    """IBM WatsonX LLM provider using langchain-ibm."""
 
     def __init__(self, config: dict[str, Any]):
+        try:
+            from ibm_watsonx_ai.metanames import GenTextParamsMetaNames as GenParams
+            from langchain_ibm import ChatWatsonx
+        except ImportError as e:
+            raise ImportError(
+                "langchain-ibm and ibm-watsonx-ai are required for WatsonX provider. "
+                "Install with: uv add langchain-ibm ibm-watsonx-ai"
+            ) from e
+
         self.url = config.get("url", "https://us-south.ml.cloud.ibm.com")
         self.project_id = os.getenv("WATSONX_PROJECT_ID")
         self.api_key = os.getenv("WATSONX_API_KEY")
-        self.model = config.get("model", "meta-llama/llama-3-70b-instruct")
+        self.model = config.get("model", "ibm/granite-4-h-small")
         self.temperature = config.get("temperature", 0.7)
         self.max_tokens = config.get("max_tokens", 4000)
 
@@ -70,35 +79,32 @@ class WatsonXProvider(LLMProvider):
         if not self.project_id:
             raise ValueError("WatsonX project ID not found in .env file (WATSONX_PROJECT_ID)")
 
+        # Initialize ChatWatsonx
+        parameters = {
+            GenParams.DECODING_METHOD: "sample",
+            GenParams.MIN_NEW_TOKENS: 1,
+            GenParams.MAX_NEW_TOKENS: self.max_tokens,
+            GenParams.TEMPERATURE: self.temperature,
+        }
+
+        self.chat = ChatWatsonx(
+            model_id=self.model,
+            url=self.url,  # type: ignore[arg-type]
+            project_id=self.project_id,
+            params=parameters,
+        )
+
     def generate(self, prompt: str, system_prompt: str | None = None) -> str:
-        """Generate text using WatsonX API."""
-        # Combine system and user prompt
-        full_prompt = prompt
-        if system_prompt:
-            full_prompt = f"{system_prompt}\n\n{prompt}"
-
-        url = f"{self.url}/ml/v1/text/generation?version=2023-05-29"
-
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        }
-
-        payload = {
-            "model_id": self.model,
-            "input": full_prompt,
-            "parameters": {
-                "temperature": self.temperature,
-                "max_new_tokens": self.max_tokens,
-            },
-            "project_id": self.project_id,
-        }
-
+        """Generate text using WatsonX via langchain-ibm."""
         try:
-            response = requests.post(url, headers=headers, json=payload, timeout=300)
-            response.raise_for_status()
-            return response.json()["results"][0]["generated_text"]
+            # Combine system and user prompt if provided
+            full_prompt = prompt
+            if system_prompt:
+                full_prompt = f"{system_prompt}\n\n{prompt}"
+
+            # Use invoke instead of stream for simpler synchronous response
+            response = self.chat.invoke(full_prompt)
+            return response.content
         except Exception as e:
             raise RuntimeError(f"WatsonX API error: {e}") from e
 
