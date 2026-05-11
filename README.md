@@ -1,194 +1,177 @@
-# 🧱 Python Blueprint
+# LLM Wiki - AI Agents Knowledge Base
 
-A modern, opinionated starting point for new Python projects — with enforced Python versioning, reproducible environments, automated dependency management, and a robust pre-commit setup.
+A living, evolving knowledge base about AI Agents, built using the [LLM Wiki pattern](https://karpathy.ai/llmwiki) by Andrej Karpathy.
 
-Setting up a new Python project can take time. You must decide:
+## What is this?
 
-- Which Python version to use
-- How to manage dependencies and virtual environments
-- Which code-quality tools to include
-- How to ensure consistent environments across developers
+This is not a traditional RAG system. Instead of retrieving from raw documents on every query, an LLM incrementally builds and maintains a **persistent wiki** - a structured, interlinked collection of markdown files that synthesizes knowledge from multiple sources over time.
 
-**Python Blueprint** solves all that for you — providing a clean, production-ready starting point with zero friction.
+The key difference: **the wiki is a compounding artifact**. Cross-references are already there. Contradictions have been flagged. The synthesis reflects everything you've read. The wiki gets richer with every source you add and every question you ask.
 
----
+## Structure
 
-## 🚀 Key Design Principles
-
-### 🐍 Python Version Enforcement
-
-Not all Python versions are compatible. Features in newer versions may break on older interpreters.
-`uv` ensures that your project always runs on the expected Python version, preventing runtime surprises.
-
-### 🌱 Virtual Environment Management
-
-Each project runs in an isolated environment to avoid dependency conflicts.
-While `pip` requires manual setup (`venv` or `virtualenv`), **`uv` automatically manages virtual environments**, ensuring consistent environments across all machines.
-
-### 🔁 Reproducible Environments
-
-The “works on my machine” problem is real.
-`uv` maintains a lockfile that freezes exact dependency versions, making your builds reproducible across development, CI, and production.
-
-### 📦 Dependency Management
-
-You can choose to list only direct dependencies or lock all transitive ones.
-Python Blueprint opts for **locked dependencies** — ensuring deterministic builds while simplifying collaboration and CI integration.
-
-### 🧰 Development Tool Integration
-
-Beyond dependencies, a solid setup integrates **linters**, **type checkers**, and **security tools**.
-Consistent tooling across the team helps maintain code quality, prevent secret leaks, and enforce coding standards.
-
-### 🧩 Separate Development & Production Dependencies
-
-Only install what you need in production.
-Development dependencies (testing, linting, formatting) are isolated from runtime requirements, reducing deployment size and improving security.
-
-### 🚢 Packaging & Distribution
-
-Python Blueprint is ready for packaging.
-You can easily build and publish your code as an internal package or to public repositories like **PyPI**, ensuring smooth scaling as your project grows.
-
----
-
-## 🧰 Pre-commit Hooks
-
-The project comes with a full **`.pre-commit-config.yaml`** that enforces code hygiene and security before every commit.
-
-| Tool                                           | Purpose                                         |
-| ---------------------------------------------- | ----------------------------------------------- |
-| **check-yaml, check-json, check-toml**         | Validate syntax for config files                |
-| **check-ast**                                  | Ensure Python files are syntactically correct   |
-| **end-of-file-fixer**, **trailing-whitespace** | Keep files clean and consistent                 |
-| **pyupgrade**                                  | Modernize syntax automatically (`--py310-plus`) |
-| **black**                                      | Enforce consistent code formatting              |
-| **isort**                                      | Sort and group imports properly                 |
-| **flake8**                                     | Detect code smells and style violations         |
-| **mypy**                                       | Perform static type checking                    |
-| **bandit**                                     | Identify common security vulnerabilities        |
-| **detect-secrets**                             | Prevent accidental secret leaks                 |
-| **prettier**                                   | Format Markdown, YAML, and JSON files           |
-
-Together, these hooks ensure that every commit meets your team’s standards before it ever reaches the repository.
-
----
-
-## ⚙️ Setup
-
-### 1️⃣ Clone the Repository
-
-```bash
-git clone https://github.com/your-org/python-blueprint.git
-cd python-blueprint
+```
+llm-wiki/
+├── raw/                    # Source documents (immutable)
+│   ├── articles/          # Web articles in markdown
+│   └── assets/            # Images and media files
+├── wiki/                   # LLM-maintained knowledge base
+│   ├── index.md           # Master catalog of all pages
+│   ├── log.md             # Chronological operation log
+│   ├── overview.md        # General synthesis
+│   ├── entities/          # People, orgs, tools
+│   ├── concepts/          # Key concepts and patterns
+│   ├── sources/           # Summaries of raw documents
+│   └── analyses/          # Generated analyses
+├── src/llm_wiki/          # Helper tools
+│   └── ingest.py          # Status checker
+├── SCHEMA.md              # Wiki structure and workflows
+└── README.md              # This file
 ```
 
-### 2️⃣ Install Python 3.14
+## Quick Start
 
-```bash
-uv python install 3.14
-uv python pin 3.14  # pins this version for the project
+### 1. Add Your First Source
+
+Save a web article about AI Agents as markdown in `raw/articles/`.
+
+**Easy way**: Use [Obsidian Web Clipper](https://obsidian.md/clipper)
+
+### 2. Ingest the Source
+
+Tell your LLM agent (Claude, ChatGPT, etc.):
+
+```
+Please ingest the article at raw/articles/[your-filename].md
+following the SCHEMA.md workflow.
 ```
 
-### 2️⃣ Sync Dependencies with uv
+The LLM will read, discuss, create wiki pages, and update the index.
 
-This creates and activates a virtual environment automatically, installing all development dependencies (linters, formatters, type checkers, test tools, etc.).
+### 3. Explore the Wiki
+
+- `wiki/index.md` - See all pages
+- `wiki/sources/` - Read summaries
+- `wiki/entities/` - See extracted entities
+- `wiki/concepts/` - See key concepts
+- `wiki/log.md` - See what happened
+
+**Pro tip**: Open this folder in [Obsidian](https://obsidian.md) to browse with graph view!
+
+### 4. Ask Questions
+
+Query your knowledge base:
+
+```
+What are the main concepts from the article I just ingested?
+```
+
+The LLM will search the wiki and synthesize an answer.
+
+### 5. Add More Sources
+
+Repeat steps 1-2. Watch your knowledge base grow!
+
+## Helper Tools
+
+Check wiki status:
+```bash
+.venv/bin/python src/llm_wiki/ingest.py status
+```
+
+See next article to process:
+```bash
+.venv/bin/python src/llm_wiki/ingest.py next
+```
+
+List unprocessed articles:
+```bash
+.venv/bin/python src/llm_wiki/ingest.py list
+```
+
+## Workflows
+
+### Ingest Workflow
+1. Add source to `raw/articles/`
+2. LLM reads and discusses with you
+3. LLM creates summary in `wiki/sources/`
+4. LLM updates/creates entity and concept pages
+5. LLM updates index and logs the operation
+
+### Query Workflow
+1. You ask a question
+2. LLM searches index for relevant pages
+3. LLM reads pages and synthesizes answer
+4. Substantial answers get filed in `wiki/analyses/`
+5. Query is logged
+
+### Lint Workflow
+1. LLM checks for contradictions
+2. Identifies stale content
+3. Finds orphaned pages
+4. Suggests missing links
+5. Recommends new sources to explore
+
+## Domain Focus
+
+This wiki focuses on **AI Agents**:
+- Agent architectures (ReAct, ReWOO, Reflexion, etc.)
+- Tool use and function calling
+- Planning and reasoning
+- Multi-agent systems
+- Memory systems
+- Evaluation and benchmarking
+
+## Key Features
+
+- **Persistent Knowledge**: Information is compiled once and kept current
+- **Cross-Referenced**: Pages link to related concepts and entities
+- **Evolving**: The wiki improves with every source and query
+- **Transparent**: All operations logged in `wiki/log.md`
+- **Structured**: Clear organization in `wiki/index.md`
+- **Maintainable**: LLM does all the bookkeeping
+
+## Setup
+
+### Install Dependencies
 
 ```bash
 uv sync --group dev
 ```
 
-### 3️⃣ Run the Project
+### Initialize Git (if not already done)
 
 ```bash
-uv run python -m python_blueprint.hello
+git init
+git add -A
+git commit -m "Initial LLM Wiki setup"
 ```
 
-Expected output:
+## Tips
 
-```bash
-Hello, Python Blueprint! 👋
-```
+1. **Use Obsidian**: Open this folder in Obsidian to browse with graph view
+2. **One source at a time**: Ingest sources individually for better control
+3. **Stay involved**: Review summaries and guide what to emphasize
+4. **File good answers**: Save substantial query responses as wiki pages
+5. **Regular linting**: Keep the wiki healthy as it grows
+6. **Version control**: Commit after significant changes
 
-### 4️⃣ Run Tests
+## Philosophy
 
-All tests are located under tests/ and automatically discovered by pytest.
+> "The tedious part of maintaining a knowledge base is not the reading or the thinking — it's the bookkeeping. LLMs don't get bored, don't forget to update a cross-reference, and can touch 15 files in one pass. The wiki stays maintained because the cost of maintenance is near zero."
+>
+> — Andrej Karpathy
 
-```bash
-uv run pytest tests
-```
+The human's job: curate sources, direct analysis, ask good questions, think about meaning.
+The LLM's job: everything else.
 
-To check the coverage you can run:
+## Resources
 
-```bash
-uv run coverage run -m pytest
-uv run coverage report
-```
+- [Original LLM Wiki concept](https://karpathy.ai/llmwiki) by Andrej Karpathy
+- [Obsidian](https://obsidian.md) - Recommended wiki browser
+- [Obsidian Web Clipper](https://obsidian.md/clipper) - Save web articles as markdown
+- [QUICKSTART.md](QUICKSTART.md) - Get started in 5 minutes
 
-### 🧪 Running Tools Manually
+## License
 
-Run individual tools via uv run:
-
-```bash
-uv run black src tests/
-uv run flake8 src tests
-uv run isort src tests/
-uv run mypy src
-uv run bandit -r src
-uv run detect-secrets scan
-```
-
-You can also run the full pre-commit suite manually:
-
-```bash
-pre-commit run --all-files
-```
-
-### 🧭 Folder Structure
-
-```
-python-blueprint/
-├── .vscode/               # Visual Studio Code configuration
-│   └── launch.json
-│   └── settings.json
-├── src/                   # Main source code
-│   └── __init__.py
-│   └── hello.py           # Example entrypoint
-│
-├── tests/                 # Unit and integration tests
-│   └── test_hello.py
-│
-├── pyproject.toml         # Project metadata and dependencies
-├── uv.lock                # Dependency lockfile (reproducible builds)
-├── .pre-commit-config.yaml # Code hygiene tools
-├── .gitignore
-├── LICENSE
-└── README.md
-```
-
-### 🧠 Why uv?
-
-**uv** is the next-generation Python package manager. It replaces pip + venv + pip-tools with a single, fast, deterministic tool that:
-
-- Automatically creates and activates virtual environments
-- Enforces Python version consistency
-- Provides blazing-fast dependency resolution and installs
-- Supports separate groups (main, development, docs, etc.)
-- Integrates seamlessly with pyproject.toml
-
-### 🧩 License
-
-MIT License © 2025 Salvatore D'Angelo / Code4Projects
-
-### ✨ Summary
-
-Python Blueprint helps you:
-
-- Start new Python projects in seconds
-- Enforce consistent environments and code quality
-- Integrate best practices for security and maintainability
-- Focus on building, not on boilerplate
-
-### 💡 Stop spending hours setting up your project.
-
-Start coding in minutes — with Python Blueprint.
+MIT License © 2025 Salvatore D'Angelo

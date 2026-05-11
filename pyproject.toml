@@ -2,13 +2,10 @@
 authors = [
   {name = "Salvatore D'Angelo", email = "sasadangelo@gmail.com"},
 ]
-dependencies = [
-  "pydantic>=2.3,<3",
-  "requests>=2.31.0,<3",
-]
-description = "A Python boilerplate with integrated dev and security tools"
-keywords = ["python", "boilerplate", "security", "dev-tools"]
-name = "python-blueprint"
+dependencies = []
+description = "LLM Wiki - A living knowledge base about AI Agents"
+keywords = ["llm", "wiki", "ai-agents", "knowledge-base"]
+name = "llm-wiki"
 readme = "README.md"
 requires-python = ">=3.10,<3.15"
 version = "0.1.0"
