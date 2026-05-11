@@ -93,11 +93,19 @@ def create_source_summary(wiki_dir: Path, article_path: Path, frontmatter: dict,
     filename = sanitize_filename(frontmatter.get("title", article_path.stem))
     output_path = sources_dir / f"{filename}.md"
 
+    # Convert to absolute path first, then make relative to cwd
+    abs_path = article_path.resolve()
+    try:
+        rel_path = abs_path.relative_to(Path.cwd())
+    except ValueError:
+        # If path is not relative to cwd, just use the path as-is
+        rel_path = article_path
+
     content = f"""---
 type: source
 created: {datetime.now().strftime("%Y-%m-%d")}
 updated: {datetime.now().strftime("%Y-%m-%d")}
-source_file: {article_path.relative_to(Path.cwd())}
+source_file: {rel_path}
 url: {frontmatter.get("url", "")}
 author: {frontmatter.get("author", "")}
 tags: {metadata.get("tags", [])}
