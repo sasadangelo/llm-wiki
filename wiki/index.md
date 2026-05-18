@@ -1,7 +1,7 @@
 ---
 type: index
-created: 2026-05-11
-updated: 2026-05-11
+created: 2026-05-18
+updated: 2026-05-18
 ---
 
 # Wiki Index - AI Agents Knowledge Base
@@ -53,5 +53,5 @@ this file after every ingest operation.
 ---
 
 **Total Pages**: 3 (index, log, overview)
-**Last Updated**: 2026-05-11
+**Last Updated**: 2026-05-18
 **Sources Processed**: 0

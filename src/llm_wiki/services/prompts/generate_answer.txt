@@ -1,0 +1,9 @@
+Answer the following question based on the wiki pages provided.
+
+Question: {question}
+
+Wiki Pages:
+{context}
+
+Provide a clear, concise answer with citations to the source pages.
+Format citations as [page-name](path/to/page.md).

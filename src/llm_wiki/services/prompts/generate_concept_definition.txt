@@ -1,0 +1,8 @@
+Based on the following article, provide a brief 2-3 sentence explanation of the concept "{concept_name}".
+
+Article Title: {article_title}
+
+Article Content (first 3000 chars):
+{article_content}
+
+Write a concise, informative explanation that describes what {concept_name} is and why it's important in the context of AI agents and LLMs. Return ONLY the explanation text, no additional formatting or labels.

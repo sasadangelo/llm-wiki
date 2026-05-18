@@ -10,7 +10,7 @@ from pathlib import Path
 from re import Match
 
 
-def list_raw_articles():
+def list_raw_articles() -> list[Path]:
     """List all articles in raw/articles/ that haven't been ingested yet."""
     raw_dir = Path("raw/articles")
     wiki_sources = Path("wiki/sources")

@@ -1,7 +1,7 @@
 ---
 type: overview
-created: 2026-05-11
-updated: 2026-05-11
+created: 2026-05-18
+updated: 2026-05-18
 tags: [meta, overview]
 sources: []
 ---
@@ -20,7 +20,7 @@ insights about agent architectures, patterns, tools, and best practices.
 **Status**: Initialized
 **Sources Processed**: 0
 **Total Pages**: 3 (index, log, overview)
-**Last Updated**: 2026-05-11
+**Last Updated**: 2026-05-18
 
 ## Scope
 

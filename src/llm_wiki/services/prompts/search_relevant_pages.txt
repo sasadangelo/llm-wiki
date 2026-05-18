@@ -1,0 +1,11 @@
+Given this wiki index and a user question, identify the most relevant page paths to answer the question.
+
+Wiki Index:
+{index_content}
+
+User Question: {question}
+
+Return ONLY a JSON array of relevant page paths (relative to wiki/), like:
+["sources/article-name.md", "concepts/concept-name.md"]
+
+Return maximum 5 most relevant pages. If no relevant pages, return empty array [].

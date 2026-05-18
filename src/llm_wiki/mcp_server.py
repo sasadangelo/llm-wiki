@@ -8,8 +8,8 @@ import asyncio
 from pathlib import Path
 from typing import Any
 
-from agent_ingest import ingest_article as do_ingest
-from agent_query import query_wiki as do_query
+from doc_ingest import ingest_article as do_ingest
+from doc_query import query_wiki as do_query
 from ingest import list_raw_articles
 from mcp.server import Server
 from mcp.server.stdio import stdio_server

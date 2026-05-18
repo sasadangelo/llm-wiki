@@ -1,0 +1,1 @@
+You are a search assistant. Return only valid JSON arrays of file paths.

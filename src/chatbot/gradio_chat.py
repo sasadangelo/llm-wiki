@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 Salvatore D'Angelo, Code4Projects
+# Licensed under the MIT License. See LICENSE.md for details.
+# -----------------------------------------------------------------------------
 """
 Simple Gradio chat interface for LLM Wiki Agent.
 """
 
 import gradio as gr
 import requests  # type: ignore[import-untyped]
+from gradio.chat_interface import ChatInterface
 
 
 def chat(message, history):
@@ -33,8 +38,8 @@ def chat(message, history):
 
 
 # Create Gradio interface
-demo = gr.ChatInterface(
-    chat,
+demo: ChatInterface = gr.ChatInterface(
+    fn=chat,
     title="🤖 LLM Wiki Assistant",
     description="Ask me anything about the wiki! I can ingest articles, answer questions, and show status.",
     examples=[
@@ -51,5 +56,3 @@ if __name__ == "__main__":
     print("   .venv/bin/python src/llm_wiki/http_agent_server.py")
     print()
     demo.launch(server_name="0.0.0.0", server_port=7860)  # nosec B104
-
-# Made with Bob

@@ -1,0 +1,15 @@
+Analyze this article and extract key metadata in JSON format.
+
+Article Title: {title}
+Author: {author}
+
+Article Content (first 2000 chars):
+{content}
+
+Extract and return ONLY a JSON object with:
+- summary: A 2-3 sentence summary of the article
+- key_concepts: List of 3-5 main technical concepts discussed
+- entities: List of people, organizations, or tools mentioned
+- tags: List of 3-5 relevant tags
+
+Return ONLY the JSON, no other text.

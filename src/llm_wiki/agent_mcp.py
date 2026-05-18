@@ -11,10 +11,10 @@ import re
 from pathlib import Path
 from typing import Any
 
-from agent_ingest import ingest_article as do_ingest
-from agent_query import query_wiki as do_query
+from clients import get_llm_client
+from doc_ingest import ingest_article as do_ingest
+from doc_query import query_wiki as do_query
 from ingest import list_raw_articles
-from llm_provider import get_llm_provider
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
@@ -27,10 +27,10 @@ llm = None
 
 
 def get_llm():
-    """Get or initialize LLM provider."""
+    """Get or initialize LLM client."""
     global llm
     if llm is None:
-        llm = get_llm_provider("config.yaml")
+        llm = get_llm_client()
     return llm
 
 

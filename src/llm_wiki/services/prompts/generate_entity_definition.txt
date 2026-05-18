@@ -1,0 +1,8 @@
+Based on the following article, provide a brief 2-3 sentence definition of "{entity_name}".
+
+Article Title: {article_title}
+
+Article Content (first 3000 chars):
+{article_content}
+
+Write a concise, informative definition that explains what {entity_name} is and its relevance in the context of AI agents and LLMs. Return ONLY the definition text, no additional formatting or labels.

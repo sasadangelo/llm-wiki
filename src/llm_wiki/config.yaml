@@ -1,0 +1,26 @@
+llm:
+  ollama:
+    base_url: http://localhost:11434
+    model: llama3.2
+    temperature: 0.7
+  openai:
+    max_tokens: 4000
+    model: gpt-4
+    temperature: 0.7
+  provider: watsonx
+  watsonx:
+    max_tokens: 4000
+    model: openai/gpt-oss-120b
+    temperature: 0.7
+    url: https://us-south.ml.cloud.ibm.com
+log:
+  compression: zip
+  console: false
+  file: logs/llm-wiki.log
+  level: INFO
+  retention: 7 days
+  rotation: 10 MB
+wiki:
+  max_chunk_size: 8000
+  raw_dir: raw
+  wiki_dir: wiki
